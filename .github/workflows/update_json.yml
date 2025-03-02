@@ -1,0 +1,24 @@
+name: Fetch Buzzsprout JSON
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual run
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Buzzsprout JSON
+        run: curl -o buzzsprout_data.json https://storage.googleapis.com/buzzsprout-dashboard/buzzsprout_data.json
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add buzzsprout_data.json
+          git commit -m "Auto-update Buzzsprout JSON [skip ci]" || exit 0
+          git push
